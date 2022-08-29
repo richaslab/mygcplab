@@ -1,0 +1,13 @@
+#jenkins job to modify associated billing accounts for a list of projectd
+#!/bin/bash
+echo "For the following projects the billing id will be changed in the portal"
+echo "$projects"
+echo "----------------------------------------------------------------------------------------------"
+
+for project in $projects
+do
+	echo "=============================================================================================="
+    echo "Changing billing account for $project to $billingid"
+	gcloud beta billing projects link $project --billing-account=$billingid --impersonate-service-account=sa-terraformer@prj-sa-acn.iam.gserviceaccount.com
+	echo "=============================================================================================="
+done
