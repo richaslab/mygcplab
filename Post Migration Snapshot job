@@ -1,0 +1,17 @@
+#jenkins freestyle job- shell script to take snapshots of VM across a project
+#take project ID, date, region and zone as inputs
+#!/bin/bash
+echo "SETTING PROJECT ID AND ZONE"
+echo "$$$$$$$$$ $projectID $$$$$$$$$$$$ $date"
+echo "=============================================================================================="
+gcloud config set project $projectID --impersonate-service-account=sa-terraformer@prj-sa-acn.iam.gserviceaccount.com
+gcloud config set compute/zone $zone --impersonate-service-account=sa-terraformer@prj-sa-acn.iam.gserviceaccount.com
+gcloud compute disks list --format="value(name)" --impersonate-service-account=sa-terraformer@prj-sa-acn.iam.gserviceaccount.com > output.txt
+while read disk; do
+  echo "******************************INITIATING SNAPSHOT BACKUP PROCESS******************************"
+  echo "DISKNAME $disk"
+  snapname="${disk}${date}-posmigrationbkup"
+  echo "SNAPSHOT NAME $snapname"
+  gcloud compute disks snapshot $disk --snapshot-names=$snapname --storage-location=$region --impersonate-service-account=sa-terraformer@prj-sa-acn.iam.gserviceaccount.com
+  echo "----------------------------------------------------------------------------------------------"
+done <output.txt
